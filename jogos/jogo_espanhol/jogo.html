@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Radar de Distancias · Demostrativos en español</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0a0a0b;
+    --bg-1:#121214;
+    --card:#151517;
+    --card-edge:#232326;
+    --ink:#f1f0ee;
+    --ink-dim:#8d8d92;
+    --cerca:#4fd1c5;
+    --cerca-soft:#132927;
+    --media:#f2c14e;
+    --media-soft:#2b2412;
+    --lejos:#ea6b8a;
+    --lejos-soft:#2a151b;
+    --good:#7fd88a;
+    --bad:#ea6b6b;
+    --radius-lg:22px;
+    --radius-md:14px;
+    --shadow: 0 18px 40px -20px rgba(0,0,0,0.8);
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;
+    min-height:100%;
+    background: var(--bg-0);
+    color:var(--ink);
+    font-family:'Nunito', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  h1,h2,h3, .display{
+    font-family:'Baloo 2', 'Nunito', sans-serif;
+  }
+
+  button{ font-family:inherit; }
+
+  :focus-visible{
+    outline: 2px solid var(--cerca);
+    outline-offset: 3px;
+  }
+
+  .app{
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 28px 18px 60px;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    min-height:100vh;
+  }
+
+
+  header{
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  header .eyebrow{
+    font-size:0.75rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color: var(--cerca);
+    font-weight:800;
+  }
+  header h1{
+    margin:0;
+    font-size:clamp(1.5rem, 4.5vw, 2.1rem);
+    font-weight:800;
+    line-height:1.15;
+  }
+  header p{
+    margin:2px 0 0;
+    color:var(--ink-dim);
+    font-size:0.92rem;
+  }
+
+  .progress-wrap{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .progress-meta{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-size:0.82rem;
+    color:var(--ink-dim);
+    font-weight:700;
+  }
+  .progress-meta .level-tag{
+    font-family:'Baloo 2', sans-serif;
+    font-size:1rem;
+    color:var(--ink);
+  }
+  .progress-track{
+    height:8px;
+    border-radius:999px;
+    background: #1c1c1f;
+    overflow:hidden;
+    border:1px solid var(--card-edge);
+  }
+  .progress-fill{
+    height:100%;
+    border-radius:999px;
+    background: var(--cerca);
+    transition: width 0.5s cubic-bezier(.4,1.4,.6,1);
+    width:0%;
+  }
+  .score-pill{
+    align-self:center;
+    background: var(--bg-1);
+    border:1px solid var(--card-edge);
+    padding:4px 14px;
+    border-radius:999px;
+    font-size:0.78rem;
+    font-weight:700;
+    color: var(--media);
+  }
+
+ LAYOUT ---------- */
+  .game-area{
+    display:grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap:18px;
+    align-items:stretch;
+  }
+  .game-area.hidden{ display:none; }
+
+  .panel{
+    background: var(--card);
+    border:1px solid var(--card-edge);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+  }
+
+  .panel-question{
+    padding: 24px 22px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    text-align:left;
+  }
+
+  .panel-question .level-badge{
+    display:inline-flex;
+    align-self:flex-start;
+    font-size:0.72rem;
+    font-weight:800;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color: var(--cerca);
+    background: var(--cerca-soft);
+    border:1px solid rgba(79,209,197,0.25);
+    padding:5px 12px;
+    border-radius:999px;
+  }
+
+  .sentence{
+    text-align:left;
+    font-size:1.05rem;
+    line-height:1.55;
+    color:var(--ink);
+    margin:0;
+  }
+  .sentence .blank{
+    display:inline-block;
+    min-width:74px;
+    border-bottom:2px solid var(--media);
+    color:var(--media);
+    font-weight:800;
+    text-align:center;
+  }
+  .sentence .adverb{
+    font-weight:800;
+    color:var(--cerca);
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    width:100%;
+  }
+  .opt-btn{
+    background: var(--bg-1);
+    border:1px solid var(--card-edge);
+    color:var(--ink);
+    padding:14px 16px;
+    border-radius: var(--radius-md);
+    font-size:1rem;
+    font-weight:700;
+    text-align:left;
+    cursor:pointer;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .opt-btn:hover:not(:disabled){
+    transform: translateX(2px);
+    background: #19191c;
+    border-color: var(--cerca);
+  }
+  .opt-btn:active:not(:disabled){ transform: translateX(0); }
+  .opt-btn:disabled{ cursor:default; }
+
+  .opt-btn.correct{
+    background: rgba(127,216,138,0.1);
+    border-color: var(--good);
+    color: var(--good);
+  }
+  .opt-btn.wrong{
+    background: rgba(234,107,107,0.1);
+    border-color: var(--bad);
+    color: var(--bad);
+    animation: shake 0.4s ease;
+  }
+  @keyframes shake{
+    0%,100%{ transform:translateX(0); }
+    20%{ transform:translateX(-6px); }
+    40%{ transform:translateX(6px); }
+    60%{ transform:translateX(-4px); }
+    80%{ transform:translateX(4px); }
+  }
+
+  .feedback{
+    min-height: 20px;
+    text-align:left;
+    font-size:0.9rem;
+    font-weight:700;
+    color: var(--bad);
+  }
+  .feedback .hint{
+    display:block;
+    font-weight:600;
+    color: var(--ink-dim);
+    margin-top:4px;
+    font-size:0.83rem;
+  }
+  .feedback.ok{ color: var(--good); }
+
+
+  .panel-scenario{
+    padding: 22px 18px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:16px;
+  }
+
+  .zone-legend{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .zone-legend span{
+    font-size:0.66rem;
+    font-weight:800;
+    padding:3px 9px;
+    border-radius:999px;
+    letter-spacing:0.02em;
+    border:1px solid transparent;
+  }
+  .zone-legend .l-cerca{ background:var(--cerca-soft); color:var(--cerca); border-color:rgba(79,209,197,0.2); }
+  .zone-legend .l-media{ background:var(--media-soft); color:var(--media); border-color:rgba(242,193,78,0.2); }
+  .zone-legend .l-lejos{ background:var(--lejos-soft); color:var(--lejos); border-color:rgba(234,107,138,0.2); }
+
+  .radar{
+    position:relative;
+    width: 260px;
+    height: 260px;
+    max-width: 100%;
+    aspect-ratio: 1/1;
+    border-radius:50%;
+    flex-shrink:0;
+  }
+  .ring{
+    position:absolute;
+    border-radius:50%;
+    border:1px dashed var(--card-edge);
+    top:50%; left:50%;
+    transform: translate(-50%,-50%);
+  }
+  .ring::before{
+    content: attr(data-label);
+    position:absolute;
+    top:4px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:0.58rem;
+    font-weight:800;
+    letter-spacing:0.05em;
+    padding:2px 7px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .ring-lejos{ width:100%; height:100%; background: radial-gradient(circle, transparent 60%, rgba(234,107,138,0.05)); }
+  .ring-lejos::before{ background:var(--lejos-soft); color:var(--lejos); }
+  .ring-media{ width:68%; height:68%; background: radial-gradient(circle, transparent 55%, rgba(242,193,78,0.06)); }
+  .ring-media::before{ background:var(--media-soft); color:var(--media); }
+  .ring-cerca{ width:36%; height:36%; background: radial-gradient(circle, rgba(79,209,197,0.1), transparent 70%); }
+  .ring-cerca::before{ background:var(--cerca-soft); color:var(--cerca); }
+
+  .speaker{
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    font-size:1.5rem;
+    z-index:5;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+  }
+  .speaker::after{
+    content:"tú";
+    position:absolute;
+    bottom:-15px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:0.58rem;
+    font-weight:800;
+    color:var(--ink-dim);
+  }
+
+  .object-marker{
+    position:absolute;
+    font-size:2.1rem;
+    z-index:4;
+    transform:translate(-50%,-50%);
+    animation: float 2.6s ease-in-out infinite;
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.55));
+  }
+  .object-marker .glow{
+    position:absolute;
+    inset:-12px;
+    border-radius:50%;
+    z-index:-1;
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  .zone-cerca .glow{ background: radial-gradient(circle, rgba(79,209,197,0.4), transparent 70%); }
+  .zone-media .glow{ background: radial-gradient(circle, rgba(242,193,78,0.35), transparent 70%); }
+  .zone-lejos .glow{ background: radial-gradient(circle, rgba(234,107,138,0.35), transparent 70%); }
+
+  @keyframes float{
+    0%,100%{ margin-top:0; }
+    50%{ margin-top:-6px; }
+  }
+  @keyframes pulse{
+    0%,100%{ opacity:0.5; transform:scale(1); }
+    50%{ opacity:0.9; transform:scale(1.12); }
+  }
+
+
+  .victory{
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:14px;
+    background: var(--card);
+    border:1px solid var(--card-edge);
+    border-radius: var(--radius-lg);
+    padding: 40px 26px;
+    box-shadow: var(--shadow);
+  }
+  .victory.show{ display:flex; }
+  .victory .trophy{
+    font-size:3.2rem;
+    animation: bounceIn 0.6s ease;
+  }
+  @keyframes bounceIn{
+    0%{ transform:scale(0.4); opacity:0; }
+    60%{ transform:scale(1.15); opacity:1; }
+    100%{ transform:scale(1); }
+  }
+  .victory h2{
+    margin:0;
+    font-size:1.6rem;
+  }
+  .victory p{
+    margin:0;
+    color:var(--ink-dim);
+    max-width:38ch;
+  }
+  .victory .final-score{
+    font-size:0.98rem;
+    font-weight:800;
+    color:var(--media);
+  }
+  .replay-btn{
+    margin-top:6px;
+    background: var(--cerca);
+    border:none;
+    color:#0a0a0b;
+    font-weight:800;
+    font-size:0.98rem;
+    padding:13px 28px;
+    border-radius:999px;
+    cursor:pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .replay-btn:hover{ transform: translateY(-2px); opacity:0.92; }
+
+  @media (max-width: 720px){
+    .game-area{
+      grid-template-columns: 1fr;
+    }
+    .panel-scenario{
+      order:-1;
+    }
+    .radar{ width:220px; height:220px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .object-marker, .object-marker .glow, .opt-btn, .victory .trophy{
+      animation:none !important;
+      transition:none !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <span class="eyebrow">Gramática en movimiento</span>
+    <h1>El Radar de Distancias</h1>
+    <p>Aprende <strong>este / ese / aquel</strong> y sus formas según lo cerca o lejos que estén las cosas.</p>
+  </header>
+
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span class="level-tag" id="levelTag">Nivel 1 de 10</span>
+      <span id="attemptsTag"></span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="score-pill" id="scorePill">⭐ Puntos: 0</div>
+  </div>
+
+  <div class="game-area" id="gameArea">
+
+    <div class="panel panel-question">
+      <span class="level-badge" id="levelBadge">Nivel 1</span>
+      <p class="sentence" id="sentenceText"></p>
+      <div class="options" id="optionsWrap"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+
+    <div class="panel panel-scenario">
+      <div class="zone-legend">
+        <span class="l-cerca">AQUÍ</span>
+        <span class="l-media">AHÍ</span>
+        <span class="l-lejos">ALLÍ</span>
+      </div>
+
+      <div class="radar" id="radar">
+        <div class="ring ring-lejos" data-label="ALLÍ"></div>
+        <div class="ring ring-media" data-label="AHÍ"></div>
+        <div class="ring ring-cerca" data-label="AQUÍ"></div>
+        <div class="speaker">🧍</div>
+        <div class="object-marker" id="objectMarker">
+          <div class="glow"></div>
+          <span id="objectEmoji">📦</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="victory" id="victoryScreen">
+    <div class="trophy">🏆</div>
+    <h2>¡Felicitaciones!</h2>
+    <p>Completaste el Radar de Distancias. Ya dominas los demostrativos <strong>este, ese</strong> y <strong>aquel</strong> — ¡y sus formas femeninas y plurales también!</p>
+    <div class="final-score" id="finalScore"></div>
+    <button class="replay-btn" id="replayBtn">Jugar de nuevo</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const LEVELS = [
+    {
+      noun:"barril", emoji:"🛢️", article:"el", distance:"cerca", adverb:"aquí",
+      correct:"Este", options:["Este","Esa","Aquel","Esos"],
+      hint:"“Este” se usa para objetos masculinos y singulares que están cerca de ti (aquí).",
+      angle:250
+    },
+    {
+      noun:"manzana", emoji:"🍎", article:"la", distance:"media", adverb:"ahí",
+      correct:"Esa", options:["Esta","Esa","Aquella","Ese"],
+      hint:"“Esa” es femenina y singular, para objetos a media distancia (ahí), ni muy cerca ni muy lejos.",
+      angle:20
+    },
+    {
+      noun:"coche", emoji:"🚗", article:"el", distance:"lejos", adverb:"allí",
+      correct:"Aquel", options:["Este","Ese","Aquel","Aquella"],
+      hint:"“Aquel” se usa para objetos masculinos y singulares muy lejos de ti (allí / allá).",
+      angle:160
+    },
+    {
+      noun:"casas", emoji:"🏠", article:"las", distance:"lejos", adverb:"allí",
+      correct:"Aquellas", options:["Estas","Esas","Aquellas","Aquellos"],
+      hint:"“Aquellas” es femenino plural, para varios objetos muy lejos (allí / allá).",
+      angle:300
+    },
+    {
+      noun:"perros", emoji:"🐶", article:"los", distance:"cerca", adverb:"aquí",
+      correct:"Estos", options:["Estos","Esos","Aquellos","Estas"],
+      hint:"“Estos” es masculino plural, para varios objetos cerca de ti (aquí).",
+      angle:80
+    },
+    {
+      noun:"libro", emoji:"📖", article:"el", distance:"media", adverb:"ahí",
+      correct:"Ese", options:["Este","Ese","Aquel","Esa"],
+      hint:"“Ese” es masculino singular, para un objeto a media distancia (ahí).",
+      angle:200
+    },
+    {
+      noun:"computadora", emoji:"💻", article:"la", distance:"cerca", adverb:"aquí",
+      correct:"Esta", options:["Esta","Esa","Aquella","Este"],
+      hint:"“Esta” es femenina singular, para un objeto que está cerca de ti (aquí).",
+      angle:340
+    },
+    {
+      noun:"estrellas", emoji:"⭐", article:"las", distance:"lejos", adverb:"allí",
+      correct:"Aquellas", options:["Estas","Esas","Aquellas","Aquellos"],
+      hint:"“Aquellas” es femenino plural, ideal para cosas muy lejanas como las estrellas (allá).",
+      angle:110
+    },
+    {
+      noun:"mesas", emoji:"🪑", article:"las", distance:"media", adverb:"ahí",
+      correct:"Esas", options:["Estas","Esas","Aquellas","Esos"],
+      hint:"“Esas” es femenino plural, para varios objetos a media distancia (ahí).",
+      angle:30
+    },
+    {
+      noun:"gato", emoji:"🐱", article:"el", distance:"cerca", adverb:"aquí",
+      correct:"Este", options:["Este","Ese","Aquel","Esta"],
+      hint:"“Este” es masculino singular, para un objeto cerca de ti (aquí).",
+      angle:230
+    }
+  ];
+
+  const RADIUS = { cerca: 52, media: 100, lejos: 145 };
+
+  let current = 0;
+  let score = 0;
+  let attempts = 0
+
+  const levelTag = document.getElementById('levelTag');
+  const levelBadge = document.getElementById('levelBadge');
+  const attemptsTag = document.getElementById('attemptsTag');
+  const progressFill = document.getElementById('progressFill');
+  const scorePill = document.getElementById('scorePill');
+  const gameArea = document.getElementById('gameArea');
+  const objectMarker = document.getElementById('objectMarker');
+  const objectEmoji = document.getElementById('objectEmoji');
+  const sentenceText = document.getElementById('sentenceText');
+  const optionsWrap = document.getElementById('optionsWrap');
+  const feedback = document.getElementById('feedback');
+  const victoryScreen = document.getElementById('victoryScreen');
+  const finalScore = document.getElementById('finalScore');
+  const replayBtn = document.getElementById('replayBtn');
+  const radar = document.getElementById('radar');
+
+  function distanceLabel(d){
+    if(d === "cerca") return "cerca de ti";
+    if(d === "media") return "a poca distancia";
+    return "muy lejos de ti";
+  }
+
+  function zoneClass(d){
+    if(d === "cerca") return "zone-cerca";
+    if(d === "media") return "zone-media";
+    return "zone-lejos";
+  }
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function renderLevel(){
+    const lvl = LEVELS[current];
+    attempts = 0;
+
+   
+    levelTag.textContent = `Nivel ${current+1} de ${LEVELS.length}`;
+    levelBadge.textContent = `Nivel ${current+1}`;
+    progressFill.style.width = `${(current / LEVELS.length) * 100}%`;
+    attemptsTag.textContent = "";
+    scorePill.textContent = `⭐ Puntos: ${score}`;
+
+
+    const r = RADIUS[lvl.distance];
+    const rad = (lvl.angle * Math.PI) / 180;
+    const radarSize = radar.clientWidth || 260;
+    const scale = radarSize / 260;
+    const x = 50 + (r * scale * Math.cos(rad) / 2.6);
+    const y = 50 + (r * scale * Math.sin(rad) / 2.6);
+    objectMarker.style.left = `${x}%`;
+    objectMarker.style.top = `${y}%`;
+    objectMarker.className = `object-marker ${zoneClass(lvl.distance)}`;
+    objectEmoji.textContent = lvl.emoji;
+
+    
+    sentenceText.innerHTML =
+      `${lvl.article.charAt(0).toUpperCase()+lvl.article.slice(1)} ${lvl.noun} ${lvl.emoji} está ` +
+      `<span class="adverb">${lvl.adverb}</span>, ${distanceLabel(lvl.distance)}.<br>` +
+      `¿Cómo lo dirías? <span class="blank">＿＿＿ ${lvl.noun}</span>`;
+
+   
+    optionsWrap.innerHTML = "";
+    const opts = shuffle(lvl.options);
+    opts.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.type = 'button';
+      btn.textContent = `${opt} ${lvl.noun}`;
+      btn.addEventListener('click', () => handleAnswer(opt, btn, lvl));
+      optionsWrap.appendChild(btn);
+    });
+
+    feedback.className = 'feedback';
+    feedback.innerHTML = "";
+  }
+
+  function handleAnswer(choice, btn, lvl){
+    const allBtns = optionsWrap.querySelectorAll('.opt-btn');
+
+    if(choice === lvl.correct){
+      allBtns.forEach(b => b.disabled = true);
+      btn.classList.add('correct');
+      feedback.className = 'feedback ok';
+      feedback.textContent = `¡Correcto! "${lvl.correct} ${lvl.noun}" — ${lvl.hint}`;
+      score += attempts === 0 ? 10 : 5;
+      scorePill.textContent = `⭐ Puntos: ${score}`;
+
+      setTimeout(() => {
+        current++;
+        if(current >= LEVELS.length){
+          showVictory();
+        } else {
+          renderLevel();
+        }
+      }, 1200);
+    } else {
+      attempts++;
+      attemptsTag.textContent = attempts === 1 ? "1 intento fallido" : `${attempts} intentos fallidos`;
+      btn.classList.add('wrong');
+      btn.disabled = true;
+      feedback.className = 'feedback';
+      feedback.innerHTML = `¡Inténtalo de nuevo! <span class="hint">${lvl.hint}</span>`;
+      setTimeout(() => btn.classList.remove('wrong'), 400);
+    }
+  }
+
+  function showVictory(){
+    progressFill.style.width = "100%";
+    gameArea.classList.add('hidden');
+    victoryScreen.classList.add('show');
+    finalScore.textContent = `Puntaje final: ${score} / ${LEVELS.length * 10}`;
+  }
+
+  replayBtn.addEventListener('click', () => {
+    current = 0;
+    score = 0;
+    victoryScreen.classList.remove('show');
+    gameArea.classList.remove('hidden');
+    renderLevel();
+  });
+
+  window.addEventListener('resize', () => {
+    if(!victoryScreen.classList.contains('show')) renderLevel();
+  });
+
+  renderLevel();
+})();
+</script>
+</body>
+</html>
