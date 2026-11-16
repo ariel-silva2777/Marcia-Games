@@ -118,7 +118,7 @@ function carregarjogos(pesquisar){
         </ul>
         `;
         cardbox.appendChild(card);}
-        if (cardbox.innerHTML === "") {
+         if (cardbox.innerHTML === "") {
     cardbox.innerHTML = `<p style="text-align: center; width: 100%; color:rgb(74, 76, 84)">Nenhum jogo encontrado para "${pesquisar}".</p>`;
 }
     });
